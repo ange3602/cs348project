@@ -51,28 +51,42 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Update a meal by ID
+//patch
 router.patch("/:id", async (req, res) => {
-  try {
-    const updatedMeal = {
-      $set: {
-        name: req.body.name,
-        items: req.body.items, // Ensure items field is consistent
-        totals: req.body.totals,
-      },
-    };
-    const mealsCollection = await db.collection("meals");
-    const result = await mealsCollection.updateOne(
-      { _id: new ObjectId(req.params.id) },
-      updatedMeal
-    );
-    res.status(200).json(result);
-  } catch (err) {
-    console.error("Error updating meal:", err);
-    res.status(500).json({ error: "Failed to update meal" });
-  }
-});
-
+    try {
+      const mealsCollection = await db.collection("meals");
+  
+      // Log the request body and current document in the database
+      console.log("Request Body:", req.body);
+      const existingMeal = await mealsCollection.findOne({ _id: new ObjectId(req.params.id) });
+      console.log("Existing Meal in DB:", existingMeal);
+  
+      // Prepare the update object
+      const updatedMeal = {
+        $set: {
+          name: req.body.name,
+          items: req.body.items, // Ensure this is being updated correctly
+          totals: req.body.totals,
+        },
+      };
+  
+      // Perform the update
+      const result = await mealsCollection.updateOne(
+        { _id: new ObjectId(req.params.id) },
+        updatedMeal
+      );
+  
+      // Log the update result
+      console.log("MongoDB Update Result:", result);
+  
+      // Respond to the client
+      res.status(200).json(result);
+    } catch (err) {
+      console.error("Error updating meal:", err);
+      res.status(500).json({ error: "Failed to update meal" });
+    }
+  });
+  
 // Delete a meal by ID
 router.delete("/:id", async (req, res) => {
   try {

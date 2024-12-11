@@ -49,6 +49,8 @@ export default function FoodForm() {
   // These methods will update the state properties.
   function updateForm(value) {
     return setForm((prev) => {
+      // console.log("EEE");
+      console.log(prev);
       return { ...prev, ...value };
     });
   }
@@ -71,7 +73,9 @@ export default function FoodForm() {
         });
       } else {
         // if we are updating a food item we will PATCH to /food/:id.
+        // console.log("EEE");
         response = await fetch(`http://localhost:5050/record/${params.id}`, {
+          
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -88,6 +92,7 @@ export default function FoodForm() {
     } catch (error) {
       console.error("A problem occurred adding or updating a food item: ", error);
     } finally {
+      console.log("EEE");
       setForm({
         name: "",
         calories: "",

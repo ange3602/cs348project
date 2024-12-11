@@ -56,19 +56,31 @@ export default function MealForm() {
     fetchData();
   }, [params.id, navigate]);
 
+//   function updateForm(value) {
+//     setForm((prev) => {
+//       const updatedForm = { ...prev, ...value };
+//       console.log("eee Updated form state:", updatedForm); // Debugging
+//       return updatedForm;
+//     });
+
+//   }
+
   function updateForm(value) {
     return setForm((prev) => {
+      // console.log("EEE");
+      console.log("PREV", prev);
       return { ...prev, ...value };
     });
   }
-
+  
   async function onSubmit(e) {
     e.preventDefault();
     const meal = { ...form };
-
+  
     try {
       let response;
       if (isNew) {
+        // If adding a new meal, send a POST request
         response = await fetch("http://localhost:5050/meal", {
           method: "POST",
           headers: {
@@ -77,6 +89,7 @@ export default function MealForm() {
           body: JSON.stringify(meal),
         });
       } else {
+        // If updating an existing meal, send a PATCH request
         response = await fetch(`http://localhost:5050/meal/${params.id}`, {
           method: "PATCH",
           headers: {
@@ -85,15 +98,16 @@ export default function MealForm() {
           body: JSON.stringify(meal),
         });
       }
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       await response.json();
     } catch (error) {
       console.error("A problem occurred adding or updating a meal: ", error);
     } finally {
+      console.log("EEE");
       setForm({
         name: "",
         items: [],
@@ -102,8 +116,9 @@ export default function MealForm() {
       navigate("/meals");
     }
   }
-
+  
   function addFoodItem(foodId) {
+    console.log("Selected foodId:", foodId);
     if (foodId && !form.items.includes(foodId)) {
       const selectedFood = foodOptions.find((food) => food._id === foodId);
       if (selectedFood) {
@@ -135,7 +150,7 @@ export default function MealForm() {
               Meal Info
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              Add the details of the meal below.
+              Add the details of the meal here.
             </p>
           </div>
   

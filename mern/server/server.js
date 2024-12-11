@@ -12,6 +12,10 @@ app.use("/record", records);
 app.use("/meal", meals);
 
 
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+
+
+
 
 // start the Express server
 app.listen(PORT, () => {

@@ -30,6 +30,7 @@ router.get("/:id", async (req, res) => {
 
 // This section will help you create a new record.
 router.post("/", async (req, res) => {
+  console.log("POSTING RECORD");
   try {
     let newDocument = {
       name: req.body.name,
@@ -50,6 +51,7 @@ router.post("/", async (req, res) => {
 
 // This section will help you update a record by id.
 router.patch("/:id", async (req, res) => {
+  console.log("patching record");
   try {
     const query = { _id: new ObjectId(req.params.id) };
     const updates = {
