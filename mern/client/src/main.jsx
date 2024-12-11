@@ -8,6 +8,7 @@ import App from "./App";
 import Record from "./components/Record";
 import RecordList from "./components/RecordList";
 import Meals from "./components/Meals";
+import Meal from "./components/Meal";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -48,6 +49,16 @@ const router = createBrowserRouter([
       {
         path: "/meals",
         element: <Meals />,
+      },
+    ],
+  },
+  {
+    path: "/edit-meal/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/edit-meal/:id",
+        element: <Meal />,
       },
     ],
   },

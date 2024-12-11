@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 const Meal = (props) => (
   <tr className="border-b transition-colors hover:bg-muted/50">
     <td className="p-4 align-middle">{props.meal.name}</td>
-    <td className="p-4 align-middle">{props.meal.foodItems.length} items</td>
+    <td className="p-4 align-middle">      {props.meal.foodItems ? props.meal.foodItems.length : 0} items
+    </td>
     <td className="p-4 align-middle">
       <div className="flex gap-2">
         <Link
@@ -13,13 +14,13 @@ const Meal = (props) => (
         >
           Edit
         </Link>
-        <button
+        {/* <button
           className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3"
           type="button"
           onClick={() => props.deleteMeal(props.meal._id)}
         >
           Delete
-        </button>
+        </button> */}
       </div>
     </td>
   </tr>

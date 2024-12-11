@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../db/connection.js"; // Adjust based on your db connection file
+import db from "../db/connection.js";
 import { ObjectId } from "mongodb";
 
 const router = express.Router();
@@ -19,13 +19,21 @@ router.get("/", async (req, res) => {
 // Get a single meal by ID
 router.get("/:id", async (req, res) => {
   try {
+    const id = req.params.id;
     const mealsCollection = await db.collection("meals");
-    const meal = await mealsCollection.findOne({ _id: new ObjectId(req.params.id) });
+
+    // Query handles both ObjectId and string _id
+    const query = ObjectId.isValid(id)
+      ? { _id: new ObjectId(id) }
+      : { _id: id };
+
+    const meal = await mealsCollection.findOne(query);
+
     if (!meal) {
-      res.status(404).json({ error: "Meal not found" });
-    } else {
-      res.status(200).json(meal);
+      return res.status(404).json({ error: "Meal not found" });
     }
+
+    res.status(200).json(meal);
   } catch (err) {
     console.error("Error fetching meal:", err);
     res.status(500).json({ error: "Failed to fetch meal" });
@@ -37,7 +45,7 @@ router.post("/", async (req, res) => {
   try {
     const newMeal = {
       name: req.body.name,
-      foodItems: req.body.foodItems || [], // Default to an empty array if not provided
+      foodItems: req.body.foodItems || [],
     };
     const mealsCollection = await db.collection("meals");
     const result = await mealsCollection.insertOne(newMeal);
