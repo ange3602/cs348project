@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-export default function Record() {
+export default function FoodForm() {
   const [form, setForm] = useState({
     name: "",
-    position: "",
-    level: "",
+    calories: "",
+    protein: "",
+    carbs: "",
+    fat: "",
+    serving_size: "",
   });
   const [isNew, setIsNew] = useState(true);
   const params = useParams();
@@ -14,7 +17,7 @@ export default function Record() {
   useEffect(() => {
     async function fetchData() {
       const id = params.id?.toString() || undefined;
-      if(!id) return;
+      if (!id) return;
       setIsNew(false);
       const response = await fetch(
         `http://localhost:5050/record/${params.id.toString()}`
@@ -24,13 +27,13 @@ export default function Record() {
         console.error(message);
         return;
       }
-      const record = await response.json();
-      if (!record) {
-        console.warn(`Record with id ${id} not found`);
+      const food = await response.json();
+      if (!food) {
+        console.warn(`Food item with id ${id} not found`);
         navigate("/");
         return;
       }
-      setForm(record);
+      setForm(food);
     }
     fetchData();
     return;
@@ -46,26 +49,26 @@ export default function Record() {
   // This function will handle the submission.
   async function onSubmit(e) {
     e.preventDefault();
-    const person = { ...form };
+    const foodItem = { ...form };
     try {
       let response;
       if (isNew) {
-        // if we are adding a new record we will POST to /record.
+        // if we are adding a new food item we will POST to /food.
         response = await fetch("http://localhost:5050/record", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(person),
+          body: JSON.stringify(foodItem),
         });
       } else {
-        // if we are updating a record we will PATCH to /record/:id.
+        // if we are updating a food item we will PATCH to /food/:id.
         response = await fetch(`http://localhost:5050/record/${params.id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(person),
+          body: JSON.stringify(foodItem),
         });
       }
 
@@ -73,17 +76,28 @@ export default function Record() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('A problem occurred adding or updating a record: ', error);
+      console.error("A problem occurred adding or updating a food item: ", error);
     } finally {
-      setForm({ name: "", position: "", level: "" });
+      setForm({
+        name: "",
+        calories: "",
+        protein: "",
+        carbs: "",
+        fat: "",
+        serving_size: "",
+      });
       navigate("/");
     }
   }
 
-  // This following section will display the form that takes the input from the user.
+  // Cancel button handler
+  function onCancel() {
+    navigate("/"); // Navigate back to the main page or previous page
+  }
+
   return (
     <>
-      <h3 className="text-lg font-semibold p-4">Create/Update Employee Record</h3>
+      <h3 className="text-lg font-semibold p-4">Create/Update Food Item</h3>
       <form
         onSubmit={onSubmit}
         className="border rounded-lg overflow-hidden p-4"
@@ -91,118 +105,107 @@ export default function Record() {
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
           <div>
             <h2 className="text-base font-semibold leading-7 text-slate-900">
-              Employee Info
+              Food Info
             </h2>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              This information will be displayed publicly so be careful what you
-              share.
+              Add the details of the food item below.
             </p>
           </div>
 
-          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 ">
-            <div className="sm:col-span-4">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium leading-6 text-slate-900"
-              >
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium">
                 Name
               </label>
-              <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="First Last"
-                    value={form.name}
-                    onChange={(e) => updateForm({ name: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="sm:col-span-4">
-              <label
-                htmlFor="position"
-                className="block text-sm font-medium leading-6 text-slate-900"
-              >
-                Position
-              </label>
-              <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="position"
-                    id="position"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="Developer Advocate"
-                    value={form.position}
-                    onChange={(e) => updateForm({ position: e.target.value })}
-                  />
-                </div>
-              </div>
+              <input
+                type="text"
+                id="name"
+                value={form.name}
+                onChange={(e) => updateForm({ name: e.target.value })}
+                placeholder="Food Name (e.g., Egg)"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
             </div>
             <div>
-              <fieldset className="mt-4">
-                <legend className="sr-only">Position Options</legend>
-                <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                  <div className="flex items-center">
-                    <input
-                      id="positionIntern"
-                      name="positionOptions"
-                      type="radio"
-                      value="Intern"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Intern"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
-                    <label
-                      htmlFor="positionIntern"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
-                    >
-                      Intern
-                    </label>
-                    <input
-                      id="positionJunior"
-                      name="positionOptions"
-                      type="radio"
-                      value="Junior"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Junior"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
-                    <label
-                      htmlFor="positionJunior"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
-                    >
-                      Junior
-                    </label>
-                    <input
-                      id="positionSenior"
-                      name="positionOptions"
-                      type="radio"
-                      value="Senior"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Senior"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
-                    <label
-                      htmlFor="positionSenior"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
-                    >
-                      Senior
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
+              <label htmlFor="calories" className="block text-sm font-medium">
+                Calories
+              </label>
+              <input
+                type="number"
+                id="calories"
+                value={form.calories}
+                onChange={(e) => updateForm({ calories: e.target.value })}
+                placeholder="Calories"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
+            </div>
+            <div>
+              <label htmlFor="protein" className="block text-sm font-medium">
+                Protein (g)
+              </label>
+              <input
+                type="number"
+                id="protein"
+                value={form.protein}
+                onChange={(e) => updateForm({ protein: e.target.value })}
+                placeholder="Protein"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
+            </div>
+            <div>
+              <label htmlFor="carbs" className="block text-sm font-medium">
+                Carbs (g)
+              </label>
+              <input
+                type="number"
+                id="carbs"
+                value={form.carbs}
+                onChange={(e) => updateForm({ carbs: e.target.value })}
+                placeholder="Carbs"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
+            </div>
+            <div>
+              <label htmlFor="fat" className="block text-sm font-medium">
+                Fat (g)
+              </label>
+              <input
+                type="number"
+                id="fat"
+                value={form.fat}
+                onChange={(e) => updateForm({ fat: e.target.value })}
+                placeholder="Fat"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
+            </div>
+            <div>
+              <label htmlFor="serving_size" className="block text-sm font-medium">
+                Serving Size
+              </label>
+              <input
+                type="text"
+                id="serving_size"
+                value={form.serving_size}
+                onChange={(e) => updateForm({ serving_size: e.target.value })}
+                placeholder="Serving Size (e.g., 1 large egg)"
+                className="mt-2 block w-full border px-3 py-2 rounded"
+              />
             </div>
           </div>
         </div>
-        <input
-          type="submit"
-          value="Save Employee Record"
-          className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer mt-4"
-        />
+        <div className="mt-4 flex gap-2">
+          <input
+            type="submit"
+            value="Save Food Item"
+            className="inline-flex items-center mr-2 justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer"
+          />
+          <input
+            type="button"
+            value="Cancel"
+            onClick={onCancel}
+            className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 hover:text-accent-foreground h-9 rounded-md px-3 cursor-pointer"
+          />
+        </div>
       </form>
     </>
   );
