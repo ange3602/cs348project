@@ -31,7 +31,7 @@ export default function MealsList() {
   // Fetch all meals from the database
   useEffect(() => {
     async function fetchMeals() {
-      const response = await fetch(`http://localhost:5050/meals`);
+      const response = await fetch(`http://localhost:5050/meal`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -45,7 +45,7 @@ export default function MealsList() {
 
   // Delete a meal by ID
   async function deleteMeal(id) {
-    await fetch(`http://localhost:5050/meals/${id}`, {
+    await fetch(`http://localhost:5050/meal/${id}`, {
       method: "DELETE",
     });
     const updatedMeals = meals.filter((meal) => meal._id !== id);

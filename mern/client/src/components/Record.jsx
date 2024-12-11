@@ -33,7 +33,14 @@ export default function FoodForm() {
         navigate("/");
         return;
       }
-      setForm(food);
+      setForm({
+        name: food.name || "",
+        calories: food.calories || "",
+        protein: food.protein || "",
+        carbs: food.carbs || "",
+        fat: food.fat || "",
+        serving_size: food.serving_size || "",
+      });
     }
     fetchData();
     return;
@@ -50,6 +57,7 @@ export default function FoodForm() {
   async function onSubmit(e) {
     e.preventDefault();
     const foodItem = { ...form };
+
     try {
       let response;
       if (isNew) {
@@ -75,6 +83,8 @@ export default function FoodForm() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      await response.json();
     } catch (error) {
       console.error("A problem occurred adding or updating a food item: ", error);
     } finally {

@@ -3,7 +3,7 @@ import express from "express";
 // This will help us connect to the database
 import db from "../db/connection.js";
 
-// This help convert the id from string to ObjectId for the _id.
+// This helps convert the id from string to ObjectId for the _id.
 import { ObjectId } from "mongodb";
 
 // router is an instance of the express router.
@@ -24,8 +24,8 @@ router.get("/:id", async (req, res) => {
   let query = { _id: new ObjectId(req.params.id) };
   let result = await collection.findOne(query);
 
-  if (!result) res.send("Not found").status(404);
-  else res.send(result).status(200);
+  if (!result) res.status(404).send("Not found");
+  else res.status(200).send(result);
 });
 
 // This section will help you create a new record.
@@ -33,12 +33,15 @@ router.post("/", async (req, res) => {
   try {
     let newDocument = {
       name: req.body.name,
-      position: req.body.position,
-      level: req.body.level,
+      calories: req.body.calories,
+      protein: req.body.protein,
+      carbs: req.body.carbs,
+      fat: req.body.fat,
+      serving_size: req.body.serving_size,
     };
     let collection = await db.collection("food");
     let result = await collection.insertOne(newDocument);
-    res.send(result).status(204);
+    res.status(201).send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding record");
@@ -52,14 +55,17 @@ router.patch("/:id", async (req, res) => {
     const updates = {
       $set: {
         name: req.body.name,
-        position: req.body.position,
-        level: req.body.level,
+        calories: req.body.calories,
+        protein: req.body.protein,
+        carbs: req.body.carbs,
+        fat: req.body.fat,
+        serving_size: req.body.serving_size,
       },
     };
 
     let collection = await db.collection("food");
     let result = await collection.updateOne(query, updates);
-    res.send(result).status(200);
+    res.status(200).send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating record");
@@ -74,7 +80,7 @@ router.delete("/:id", async (req, res) => {
     const collection = db.collection("food");
     let result = await collection.deleteOne(query);
 
-    res.send(result).status(200);
+    res.status(200).send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error deleting record");
