@@ -104,8 +104,12 @@ export default function MealForm() {
   }
 
   function addFoodItem(foodId) {
-    if (!form.items.includes(foodId)) {
-      updateForm({ items: [...form.items, foodId] });
+    if (foodId && !form.items.includes(foodId)) {
+      const selectedFood = foodOptions.find((food) => food._id === foodId);
+      if (selectedFood) {
+        const updatedItems = [...form.items, selectedFood._id];
+        updateForm({ items: updatedItems });
+      }
     }
   }
 
@@ -134,16 +138,18 @@ export default function MealForm() {
               Add the details of the meal below.
             </p>
           </div>
-
+  
           <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8">
-            
             <div>
               <label htmlFor="items" className="block text-sm font-medium">
                 Food Items
               </label>
               <select
                 id="items"
-                onChange={(e) => addFoodItem(e.target.value)}
+                onChange={(e) => {
+                  addFoodItem(e.target.value);
+                  e.target.value = ""; // Reset dropdown after selection
+                }}
                 className="mt-2 block w-full border px-3 py-2 rounded"
               >
                 <option value="">Select Food Item</option>
@@ -189,4 +195,5 @@ export default function MealForm() {
       </form>
     </>
   );
+
 }

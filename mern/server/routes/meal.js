@@ -16,27 +16,21 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get a single meal by ID
+// Get a meal by ID
 router.get("/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const mealsCollection = await db.collection("meals");
+    const collection = await db.collection("meals");
+    const query = { _id: new ObjectId(req.params.id) };
+    const result = await collection.findOne(query);
 
-    // Query handles both ObjectId and string _id
-    const query = ObjectId.isValid(id)
-      ? { _id: new ObjectId(id) }
-      : { _id: id };
-
-    const meal = await mealsCollection.findOne(query);
-
-    if (!meal) {
-      return res.status(404).json({ error: "Meal not found" });
+    if (!result) {
+      res.status(404).send("Meal not found");
+    } else {
+      res.status(200).send(result);
     }
-
-    res.status(200).json(meal);
   } catch (err) {
-    console.error("Error fetching meal:", err);
-    res.status(500).json({ error: "Failed to fetch meal" });
+    console.error("Error fetching meal by ID:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -45,7 +39,8 @@ router.post("/", async (req, res) => {
   try {
     const newMeal = {
       name: req.body.name,
-      foodItems: req.body.foodItems || [],
+      items: req.body.items || [], // Keep items consistent
+      totals: req.body.totals || {}, // Include totals as part of the structure
     };
     const mealsCollection = await db.collection("meals");
     const result = await mealsCollection.insertOne(newMeal);
@@ -62,7 +57,8 @@ router.patch("/:id", async (req, res) => {
     const updatedMeal = {
       $set: {
         name: req.body.name,
-        foodItems: req.body.foodItems,
+        items: req.body.items, // Ensure items field is consistent
+        totals: req.body.totals,
       },
     };
     const mealsCollection = await db.collection("meals");
